@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import watcharaphans.bitcombine.co.th.bitcamera.R;
 
 public class MainFragment extends Fragment implements ZXingScannerView.ResultHandler{
 
@@ -59,6 +60,16 @@ public class MainFragment extends Fragment implements ZXingScannerView.ResultHan
 
         resultString = result.getText().toString().trim();
         Log.d(tag, "Result 200ms ---> " + resultString);
+        if (!resultString.isEmpty()) {
+//            Replace Fragment
+            getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.contentFragmentMain, TakePhotoFragment.takePhotoInstance(resultString))
+                    .addToBackStack(null)
+                    .commit();
+
+        }
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

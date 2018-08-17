@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!--Top Button-->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!--Save-->
+        <Button
+            android:textSize="@dimen/h1"
+            android:textStyle="bold"
+            android:textColor="#fbfbfb"
+            android:background="#0aa407"
+            android:text="@string/save"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+        <!--Camera-->
+        <TextView
+            android:textColor="#fbfbfb"
+            android:background="#3747ed"
+            android:textStyle="bold"
+            android:textSize="@dimen/h1"
+            android:gravity="center"
+            android:text="@string/camera"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <!--Cancel-->
+        <Button
+            android:id="@+id/btnCancel"
+            android:textSize="@dimen/h1"
+            android:textStyle="bold"
+            android:textColor="#fbfbfb"
+            android:background="#f50b13"
+            android:text="@string/cancel"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+
+    </LinearLayout>
+
+    <!--Result QR-->
+    <TextView
+        android:layout_margin="20dp"
+        android:id="@+id/txtResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Result"
+        android:textSize="@dimen/h1" />
+
+    <!--Camera-->
+    <LinearLayout
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!--Left-->
+        <ImageView
+            android:layout_margin="10dp"
+            android:scaleType="centerInside"
+            android:layout_weight="1"
+            android:id="@+id/imvCameraC"
+            android:background="#f28585"
+            android:src="@drawable/camera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <!--Right-->
+        <ImageView
+            android:layout_margin="10dp"
+            android:scaleType="centerInside"
+            android:layout_weight="1"
+            android:id="@+id/imvCameraD"
+            android:background="#f28585"
+            android:src="@drawable/camera"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</LinearLayout>
