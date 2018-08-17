@@ -68,5 +68,6 @@ public class MainFragment extends Fragment implements ZXingScannerView.ResultHan
             }
         }, 2000);
 
+
     }
 } //Main Class
