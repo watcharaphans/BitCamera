@@ -15,6 +15,10 @@
 
 
     <!--Content-->
+    <me.dm7.barcodescanner.zxing.ZXingScannerView
+        android:id="@+id/zxingMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 
 
