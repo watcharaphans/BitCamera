@@ -53,8 +53,6 @@ public class MainFragment extends Fragment implements ZXingScannerView.ResultHan
         zXingScannerView.stopCamera();
     }
 
-
-
     @Override
     public void handleResult(Result result) {
 
@@ -68,7 +66,6 @@ public class MainFragment extends Fragment implements ZXingScannerView.ResultHan
                     .replace(R.id.contentFragmentMain, TakePhotoFragment.takePhotoInstance(resultString))
                     .addToBackStack(null)
                     .commit();
-
         }
 
         Handler handler = new Handler();
