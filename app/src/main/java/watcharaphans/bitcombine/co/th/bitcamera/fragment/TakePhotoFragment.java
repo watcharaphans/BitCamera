@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,7 +26,10 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 import id.zelory.compressor.Compressor;
+import it.sauronsoftware.ftp4j.FTPClient;
+import it.sauronsoftware.ftp4j.FTPDataTransferListener;
 import watcharaphans.bitcombine.co.th.bitcamera.R;
+import watcharaphans.bitcombine.co.th.bitcamera.utility.MyConstant;
 
 public class TakePhotoFragment extends Fragment {
 
@@ -37,6 +41,7 @@ public class TakePhotoFragment extends Fragment {
 
     private String dirString, bitCFileString, bitDFileString;
     private String destinationPath;
+    private  boolean cameraCABoolean = false , cameraDABoolean = false;
 
     //Uri =  path  mี่เก็บค่าต่างๆ
     public static TakePhotoFragment takePhotoInstance(String resultString) {
@@ -68,8 +73,107 @@ public class TakePhotoFragment extends Fragment {
 
         cameraDController();
 
+//        Save Controller
+        saveController();
 
     }  //Main Method
+
+    private void saveController() {
+        Button button = getView().findViewById(R.id.btnSave);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (cameraCABoolean || cameraDABoolean) {
+
+                    uploadPhotoToServer();
+
+                }else{
+
+                    Toast.makeText(getActivity(), "Please Take Photo", Toast.LENGTH_SHORT).show());
+
+                }
+
+
+
+            }
+        });
+    }
+
+    private void uploadPhotoToServer() {
+
+        StrictMode.ThreadPolicy threadPolicy = new StrictMode.ThreadPolicy
+                .Builder().permitAll().build();
+        StrictMode.setThreadPolicy(threadPolicy);
+
+        FTPClient ftpClient = new FTPClient();
+        MyConstant myConstant = new MyConstant();
+        String tag = "31AugV3";
+
+
+//        For C
+        if (cameraCABoolean) {
+
+            try {
+
+                ftpClient.connect(myConstant.getHostString(), myConstant.getPortAnInt());
+                ftpClient.login(myConstant.getUserString(), myConstant.getPasswdString());
+                ftpClient.setType(FTPClient.TYPE_BINARY);
+                ftpClient.changeDirectory("AoTest");
+                ftpClient.upload(resizeCameraCFile, new MyCheckUploadListener());
+
+
+            } catch (Exception e) {
+                Log.d(tag, "e upload ===> " + e.toString());
+                try {
+
+
+                } catch (Exception e1) {
+                    Log.d(tag, "e1 upload ===> " + e1.toString());
+                }
+            }
+
+
+        } // if
+
+//        For D
+
+
+
+    }// upload
+
+    public class MyCheckUploadListener implements FTPDataTransferListener{
+
+
+        @Override
+        public void started() {
+            Toast.makeText(getActivity(), "Start Upload ", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void transferred(int i) {
+            Toast.makeText(getActivity(), "Transfer Upload ", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void completed() {
+            Toast.makeText(getActivity(), "Completed Upload ", Toast.LENGTH_SHORT).show();
+
+        }
+
+        @Override
+        public void aborted() {
+            Toast.makeText(getActivity(), "Aborted Upload ", Toast.LENGTH_SHORT).show();
+
+        }
+
+        @Override
+        public void failed() {
+            Toast.makeText(getActivity(), "Failed Upload ", Toast.LENGTH_SHORT).show();
+
+        }
+    }  // MyCheck class
+
 
     private void createFile() {
 
@@ -109,6 +213,16 @@ public class TakePhotoFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == getActivity().RESULT_OK) {
+
+            switch (requestCode) {
+                case 1:
+                    cameraCABoolean = true;
+                    break;
+                case 2:
+                    cameraDABoolean = true;
+                    break;
+
+            }
 
             showPhoto(requestCode);
 
@@ -169,6 +283,8 @@ public class TakePhotoFragment extends Fragment {
 //                int i = random.nextInt(1000);
                 cameraCFile = new File(cameraFile, bitCFileString + "C" + ".jpg");
 
+
+                // Resize image --> not work
                 try {
 
                     resizeCameraCFile = new Compressor(getActivity())  // เป็น fragment ต้องใช้ getActivity แทน this
@@ -176,18 +292,24 @@ public class TakePhotoFragment extends Fragment {
                             .setMaxHeight(480)
                             .setQuality(100)
                             .setCompressFormat(Bitmap.CompressFormat.WEBP)
-                            .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
-                                    Environment.DIRECTORY_PICTURES).getAbsolutePath())
+                            .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(Environment.
+                                    DIRECTORY_PICTURES).getAbsolutePath())
                             .compressToFile(cameraCFile);
 
                     Log.d("31AugV2", "resizeCameraCFile Path ====> " + resizeCameraCFile.getPath());
-                    Log.d("31AugV2", "resizeCameraCFile Size ===> " + getReadableFileSize(resizeCameraCFile.length()));
+
 
                 } catch (Exception e) {
-                    Log.d("31AugV2", "e resize C ===>" + e.toString());
+                    Log.d("31AugV2", "e resize C ===>" + e.toString() + " Picture : " );
+
+                    try {
+
+                    } catch (Exception e1) {
+                        Log.d("31AugV3", "e1 ===> " + e.toString());
+                    }
+
+
                 }
-
-
 
                 cameraCUri = Uri.fromFile(cameraCFile);
 
