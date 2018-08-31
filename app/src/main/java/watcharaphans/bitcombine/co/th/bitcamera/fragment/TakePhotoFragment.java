@@ -1,6 +1,8 @@
 package watcharaphans.bitcombine.co.th.bitcamera.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -9,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -19,6 +24,7 @@ import watcharaphans.bitcombine.co.th.bitcamera.R;
 public class TakePhotoFragment extends Fragment {
 
     private String resultQRString;
+    private ImageView cameraCImageView, cameraDImageView;
 
     public static TakePhotoFragment takePhotoInstance(String resultString) {
         TakePhotoFragment takePhotoFragment = new TakePhotoFragment();
@@ -39,7 +45,59 @@ public class TakePhotoFragment extends Fragment {
 //        Cancel Controller
         cancelController();
 
+//        CameraC Controller
+        cameraCController();
+
+//        CameraD Controller
+
+
     }  //Main Method
+
+    /**
+     * Receive the result from a previous call to
+     * {@link #startActivityForResult(Intent, int)}.  This follows the
+     * related Activity API as described there in
+     * {@link Activity#onActivityResult(int, int, Intent)}.
+     *
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode  The integer result code returned by the child activity
+     *                    through its setResult().
+     * @param data        An Intent, which can return result data to the caller
+     */
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == getActivity().RESULT_OK) {
+
+
+
+        } else{
+
+            Toast.makeText(getActivity(), "Please Take Photo", Toast.LENGTH_SHORT).show();
+
+        }
+
+
+   }  //  onActivity Result
+
+    private void cameraCController() {
+        cameraCImageView = getView().findViewById(R.id.imvCameraC);
+        cameraCImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //การเคลื่อนบ่้าย  Media store open camera
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 1);
+
+
+            }  // onclick
+        });
+
+    }
 
     private void cancelController() {
         Button button = getView().findViewById(R.id.btnCancel);
@@ -116,7 +174,6 @@ public class TakePhotoFragment extends Fragment {
         }
 
 
-
         if(QRcode_Convert.split("\\$",-1).length-1 == 10){
 
             String[] data = QRcode_Convert.split("\\$");
@@ -132,7 +189,6 @@ public class TakePhotoFragment extends Fragment {
 
             TextView textView2 = getView().findViewById(R.id.txtResult2);
             textView2.setText(DateTimeIn);
-
 
             Log.d(Tag, "Debug QRcode ---->" + QRcode_Convert);
             Log.d(Tag, "Debug[0]---->" + data[0]);

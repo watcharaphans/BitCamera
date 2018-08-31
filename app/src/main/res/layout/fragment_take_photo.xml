@@ -99,10 +99,9 @@
             android:layout_weight="1"
             android:id="@+id/imvCameraD"
             android:background="#8b8b8b"
-            android:src="@drawable/contractor"
+            android:src="@drawable/camera"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />
-
 
     </LinearLayout>
 
