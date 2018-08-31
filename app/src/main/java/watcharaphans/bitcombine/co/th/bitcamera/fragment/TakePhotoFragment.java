@@ -1,7 +1,11 @@
 package watcharaphans.bitcombine.co.th.bitcamera.fragment;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
@@ -25,7 +30,12 @@ public class TakePhotoFragment extends Fragment {
 
     private String resultQRString;
     private ImageView cameraCImageView, cameraDImageView;
+    private Uri cameraCUri;
+    private File cameraFile, camareCFile, cameraDFile;
 
+    private String dirString, bitCFileString;
+
+    //Uri =  path  mี่เก็บค่าต่างๆ
     public static TakePhotoFragment takePhotoInstance(String resultString) {
         TakePhotoFragment takePhotoFragment = new TakePhotoFragment();
         Bundle bundle = new Bundle();
@@ -53,26 +63,16 @@ public class TakePhotoFragment extends Fragment {
 
     }  //Main Method
 
-    /**
-     * Receive the result from a previous call to
-     * {@link #startActivityForResult(Intent, int)}.  This follows the
-     * related Activity API as described there in
-     * {@link Activity#onActivityResult(int, int, Intent)}.
-     *
-     * @param requestCode The integer request code originally supplied to
-     *                    startActivityForResult(), allowing you to identify who this
-     *                    result came from.
-     * @param resultCode  The integer result code returned by the child activity
-     *                    through its setResult().
-     * @param data        An Intent, which can return result data to the caller
-     */
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == getActivity().RESULT_OK) {
 
+//            uri = data.getData();  //นำค่าที่ได้มาใส่ uri
 
+            showPhoto(requestCode);
 
         } else{
 
@@ -83,14 +83,50 @@ public class TakePhotoFragment extends Fragment {
 
    }  //  onActivity Result
 
+    private void showPhoto(int requestCode) {
+
+        try {
+
+            //
+            Bitmap rowBitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(cameraCUri));
+           //* cameraCImageView.setImageBitmap(rowBitmap);
+
+            switch (requestCode) {
+                case 1:
+                    cameraCImageView.setImageBitmap(rowBitmap);
+                    break;
+                case 2:
+                    break;
+            }
+
+
+
+        } catch (Exception e) {
+            Log.d("31AugV1", "e showPhoto --> " + e.toString());
+        }
+
+    }
+
     private void cameraCController() {
         cameraCImageView = getView().findViewById(R.id.imvCameraC);
         cameraCImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                cameraFile = new File(Environment.getExternalStorageDirectory() + "/" + dirString);
+                if (!cameraFile.exists()) {
+                    cameraFile.mkdir();
+                }
+
+//                Random random = new Random();
+//                int i = random.nextInt(1000);
+                camareCFile = new File(cameraFile, bitCFileString + "C" + ".jpg");
+
+                cameraCUri = Uri.fromFile(camareCFile);
+
                 //การเคลื่อนบ่้าย  Media store open camera
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraCUri);
                 startActivityForResult(intent, 1);
 
 
@@ -189,6 +225,13 @@ public class TakePhotoFragment extends Fragment {
 
             TextView textView2 = getView().findViewById(R.id.txtResult2);
             textView2.setText(DateTimeIn);
+
+            dirString = data[8] + data[10];
+            bitCFileString = data[9] + data[10];
+            Log.d("31AugV1", "dirString ===> " + dirString );
+            Log.d("31AugV1", "bitCFileString ===> " + bitCFileString );
+
+            //bitCFileString = data[]
 
             Log.d(Tag, "Debug QRcode ---->" + QRcode_Convert);
             Log.d(Tag, "Debug[0]---->" + data[0]);
