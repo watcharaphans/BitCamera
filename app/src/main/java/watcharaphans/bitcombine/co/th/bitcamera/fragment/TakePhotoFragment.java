@@ -24,6 +24,7 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 
+import id.zelory.compressor.Compressor;
 import watcharaphans.bitcombine.co.th.bitcamera.R;
 
 public class TakePhotoFragment extends Fragment {
@@ -31,9 +32,11 @@ public class TakePhotoFragment extends Fragment {
     private String resultQRString;
     private ImageView cameraCImageView, cameraDImageView;
     private Uri cameraCUri , cameraDUri;
-    private File cameraFile, camareCFile, cameraDFile;
+    private File cameraFile, cameraCFile, cameraDFile;
+    private File resizeCameraCFile;
 
     private String dirString, bitCFileString, bitDFileString;
+    private String destinationPath;
 
     //Uri =  path  mี่เก็บค่าต่างๆ
     public static TakePhotoFragment takePhotoInstance(String resultString) {
@@ -69,7 +72,10 @@ public class TakePhotoFragment extends Fragment {
     }  //Main Method
 
     private void createFile() {
-        cameraFile = new File(Environment.getExternalStorageDirectory() + "/" + dirString);
+
+        destinationPath = Environment.getExternalStorageDirectory() + "/" + dirString;
+
+        cameraFile = new File(destinationPath);
         if (!cameraFile.exists()) {
             cameraFile.mkdir();
         }
@@ -119,7 +125,7 @@ public class TakePhotoFragment extends Fragment {
 
         try {
 
-            //
+            // ทดสอบภาษาไทย
 
            //* cameraCImageView.setImageBitmap(rowBitmap);
 
@@ -161,9 +167,29 @@ public class TakePhotoFragment extends Fragment {
 
 //                Random random = new Random();
 //                int i = random.nextInt(1000);
-                camareCFile = new File(cameraFile, bitCFileString + "C" + ".jpg");
+                cameraCFile = new File(cameraFile, bitCFileString + "C" + ".jpg");
 
-                cameraCUri = Uri.fromFile(camareCFile);
+                try {
+
+                    resizeCameraCFile = new Compressor(getActivity())  // เป็น fragment ต้องใช้ getActivity แทน this
+                            .setMaxWidth(640)
+                            .setMaxHeight(480)
+                            .setQuality(100)
+                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
+                            .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+                                    Environment.DIRECTORY_PICTURES).getAbsolutePath())
+                            .compressToFile(cameraCFile);
+
+                    Log.d("31AugV2", "resizeCameraCFile Path ====> " + resizeCameraCFile.getPath());
+                    Log.d("31AugV2", "resizeCameraCFile Size ===> " + getReadableFileSize(resizeCameraCFile.length()));
+
+                } catch (Exception e) {
+                    Log.d("31AugV2", "e resize C ===>" + e.toString());
+                }
+
+
+
+                cameraCUri = Uri.fromFile(cameraCFile);
 
                 //การเคลื่อนบ่้าย  Media store open camera
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -173,7 +199,7 @@ public class TakePhotoFragment extends Fragment {
             }  // onclick
         });
 
-    }
+    }// cameraC Controller
 
     private void cancelController() {
         Button button = getView().findViewById(R.id.btnCancel);
