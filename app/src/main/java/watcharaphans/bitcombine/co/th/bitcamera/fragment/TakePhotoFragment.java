@@ -30,10 +30,10 @@ public class TakePhotoFragment extends Fragment {
 
     private String resultQRString;
     private ImageView cameraCImageView, cameraDImageView;
-    private Uri cameraCUri;
+    private Uri cameraCUri , cameraDUri;
     private File cameraFile, camareCFile, cameraDFile;
 
-    private String dirString, bitCFileString;
+    private String dirString, bitCFileString, bitDFileString;
 
     //Uri =  path  mี่เก็บค่าต่างๆ
     public static TakePhotoFragment takePhotoInstance(String resultString) {
@@ -52,6 +52,9 @@ public class TakePhotoFragment extends Fragment {
 //        Show view
         showView();
 
+//        Create File
+        createFile();
+
 //        Cancel Controller
         cancelController();
 
@@ -60,8 +63,39 @@ public class TakePhotoFragment extends Fragment {
 
 //        CameraD Controller
 
+        cameraDController();
+
 
     }  //Main Method
+
+    private void createFile() {
+        cameraFile = new File(Environment.getExternalStorageDirectory() + "/" + dirString);
+        if (!cameraFile.exists()) {
+            cameraFile.mkdir();
+        }
+    }
+
+    private void cameraDController() {
+        cameraDImageView = getView().findViewById(R.id.imvCameraD);
+        cameraDImageView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+
+                cameraDFile = new File(cameraFile, bitDFileString + "D" + ".jpg");
+
+                cameraDUri = Uri.fromFile(cameraDFile);
+
+                //การเคลื่อนบ่้าย  Media store open camera
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraDUri);
+                startActivityForResult(intent, 2);
+
+
+            } // onClick
+        });
+
+
+    }
 
 
     @Override
@@ -69,8 +103,6 @@ public class TakePhotoFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == getActivity().RESULT_OK) {
-
-//            uri = data.getData();  //นำค่าที่ได้มาใส่ uri
 
             showPhoto(requestCode);
 
@@ -88,14 +120,28 @@ public class TakePhotoFragment extends Fragment {
         try {
 
             //
-            Bitmap rowBitmap = BitmapFactory.decodeStream(getActivity().getContentResolver().openInputStream(cameraCUri));
+
            //* cameraCImageView.setImageBitmap(rowBitmap);
 
             switch (requestCode) {
                 case 1:
-                    cameraCImageView.setImageBitmap(rowBitmap);
+
+                    Bitmap rowBitmap = BitmapFactory.decodeStream(getActivity().getContentResolver()
+                            .openInputStream(cameraCUri));
+
+                    // Command resize and show
+                    Bitmap resizeCBitmap = Bitmap.createScaledBitmap(rowBitmap, 800, 600, false);
+
+                    cameraCImageView.setImageBitmap(resizeCBitmap);
                     break;
                 case 2:
+                    Bitmap rowBitmap1 = BitmapFactory.decodeStream(getActivity().getContentResolver()
+                            .openInputStream(cameraDUri));
+
+                    // Command resize and show
+                    Bitmap resizeDBitmap = Bitmap.createScaledBitmap(rowBitmap1, 800, 600, false);
+
+                    cameraDImageView.setImageBitmap(resizeDBitmap);
                     break;
             }
 
@@ -113,11 +159,6 @@ public class TakePhotoFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                cameraFile = new File(Environment.getExternalStorageDirectory() + "/" + dirString);
-                if (!cameraFile.exists()) {
-                    cameraFile.mkdir();
-                }
-
 //                Random random = new Random();
 //                int i = random.nextInt(1000);
                 camareCFile = new File(cameraFile, bitCFileString + "C" + ".jpg");
@@ -128,7 +169,6 @@ public class TakePhotoFragment extends Fragment {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraCUri);
                 startActivityForResult(intent, 1);
-
 
             }  // onclick
         });
@@ -228,8 +268,10 @@ public class TakePhotoFragment extends Fragment {
 
             dirString = data[8] + data[10];
             bitCFileString = data[9] + data[10];
+            bitDFileString = data[9] + data[10];
             Log.d("31AugV1", "dirString ===> " + dirString );
             Log.d("31AugV1", "bitCFileString ===> " + bitCFileString );
+            Log.d("31AugV1", "bitDFileString ===> " + bitDFileString );
 
             //bitCFileString = data[]
 
