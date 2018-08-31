@@ -20,7 +20,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -90,7 +93,7 @@ public class TakePhotoFragment extends Fragment {
 
                 }else{
 
-                    Toast.makeText(getActivity(), "Please Take Photo", Toast.LENGTH_SHORT).show());
+                    Toast.makeText(getActivity(), "Please Take Photo", Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -120,7 +123,7 @@ public class TakePhotoFragment extends Fragment {
                 ftpClient.login(myConstant.getUserString(), myConstant.getPasswdString());
                 ftpClient.setType(FTPClient.TYPE_BINARY);
                 ftpClient.changeDirectory("AoTest");
-                ftpClient.upload(resizeCameraCFile, new MyCheckUploadListener());
+                ftpClient.upload(cameraCFile, new MyCheckUploadListener());
 
 
             } catch (Exception e) {
@@ -174,7 +177,6 @@ public class TakePhotoFragment extends Fragment {
         }
     }  // MyCheck class
 
-
     private void createFile() {
 
         destinationPath = Environment.getExternalStorageDirectory() + "/" + dirString;
@@ -224,6 +226,8 @@ public class TakePhotoFragment extends Fragment {
 
             }
 
+
+
             showPhoto(requestCode);
 
         } else{
@@ -234,6 +238,24 @@ public class TakePhotoFragment extends Fragment {
 
 
    }  //  onActivity Result
+
+    public static void ResizeImages(String sPath,String sTo) throws IOException {
+
+        Bitmap photo = BitmapFactory.decodeFile(sPath);
+        photo = Bitmap.createScaledBitmap(photo, 300, 300, false);
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        photo.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+        File f = new File(sTo);
+        f.createNewFile();
+        FileOutputStream fo = new FileOutputStream(f);
+        fo.write(bytes.toByteArray());
+        fo.close();
+
+        File file =  new File(sPath);
+        file.delete();
+
+    }
 
     private void showPhoto(int requestCode) {
 
@@ -251,6 +273,8 @@ public class TakePhotoFragment extends Fragment {
 
                     // Command resize and show
                     Bitmap resizeCBitmap = Bitmap.createScaledBitmap(rowBitmap, 800, 600, false);
+
+
 
                     cameraCImageView.setImageBitmap(resizeCBitmap);
                     break;
@@ -285,35 +309,35 @@ public class TakePhotoFragment extends Fragment {
 
 
                 // Resize image --> not work
-                try {
-
-                    resizeCameraCFile = new Compressor(getActivity())  // เป็น fragment ต้องใช้ getActivity แทน this
-                            .setMaxWidth(640)
-                            .setMaxHeight(480)
-                            .setQuality(100)
-                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
-                            .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(Environment.
-                                    DIRECTORY_PICTURES).getAbsolutePath())
-                            .compressToFile(cameraCFile);
-
-                    Log.d("31AugV2", "resizeCameraCFile Path ====> " + resizeCameraCFile.getPath());
-
-
-                } catch (Exception e) {
-                    Log.d("31AugV2", "e resize C ===>" + e.toString() + " Picture : " );
-
-                    try {
-
-                    } catch (Exception e1) {
-                        Log.d("31AugV3", "e1 ===> " + e.toString());
-                    }
-
-
-                }
+//                try {
+//
+//                    resizeCameraCFile = new Compressor(getActivity())  // เป็น fragment ต้องใช้ getActivity แทน this
+//                            .setMaxWidth(640)
+//                            .setMaxHeight(480)
+//                            .setQuality(100)
+//                            .setCompressFormat(Bitmap.CompressFormat.WEBP)
+//                            .setDestinationDirectoryPath(Environment.getExternalStoragePublicDirectory(
+//                                    Environment.DIRECTORY_PICTURES).getAbsolutePath())
+//                            .compressToFile(cameraCFile);
+//
+//                    Log.d("31AugV2", "resizeCameraCFile Path ====> " + resizeCameraCFile.getPath());
+//
+//
+//                } catch (Exception e) {
+//                    Log.d("31AugV2", "e resize C ===>" + e.toString() + " Picture : " );
+//
+//                    try {
+//
+//                    } catch (Exception e1) {
+//                        Log.d("31AugV3", "e1 ===> " + e.toString());
+//                    }
+//
+//                }
 
                 cameraCUri = Uri.fromFile(cameraCFile);
 
                 //การเคลื่อนบ่้าย  Media store open camera
+                Log.d("31AugV3", " CamC open ===> ");
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, cameraCUri);
                 startActivityForResult(intent, 1);
